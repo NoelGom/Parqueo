@@ -1,0 +1,8 @@
+cd C:\Users\gomez\Parqueo\api_parqueo
+.\.venv\Scripts\activate
+python manage.py runserver
+
+
+
+cd C:\Users\gomez\Parqueo\parqueo-frontend
+npm run dev
