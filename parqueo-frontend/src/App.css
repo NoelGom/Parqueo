@@ -36,3 +36,36 @@ thead{background:rgba(255,255,255,.08)}
 th,td{padding:10px;border-top:1px solid var(--border);text-align:left}
 td.actions{text-align:right}
 .empty{opacity:.7;text-align:center;padding:18px}
+
+/* ===== Estilos Pago con tarjeta ===== */
+.card-gradient{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  background: radial-gradient(1200px 240px at 30% 0,
+              rgba(16,185,129,.25), transparent 60%),
+              rgba(255,255,255,.04);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card-head .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid var(--border);font-size:12px}
+
+.grid-2{display:grid;grid-template-columns: 1fr 320px; gap:24px}
+@media (max-width: 900px){ .grid-2{ grid-template-columns: 1fr } }
+
+.summary{border:1px dashed var(--border);border-radius:12px;padding:14px;height:max-content;background:rgba(255,255,255,.03)}
+.summary h4{margin:0 0 10px}
+.summary-row{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid rgba(255,255,255,.06)}
+.summary-row:first-of-type{border-top:none}
+
+/* asegurar contraste de opciones del select */
+.select option{ background:#0b1222; color:#fff; }
+/* placeholders más sutiles */
+.input::placeholder{ color: rgba(255,255,255,.45); }
+
+/* acciones */
+.actions{display:flex;justify-content:flex-end;gap:12px;margin-top:6px}
+
+/* botones alternativos */
+.btn.pay-flat{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04)}
+.btn.pay-flat:hover{background:rgba(255,255,255,.06)}
