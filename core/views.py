@@ -24,7 +24,7 @@ from .serializers import (
 )
 
 # ---------- Healthcheck ----------
-def status(request):
+def healthcheck(request):
     return HttpResponse("Backend funcionando correctamente", content_type="text/plain")
 
 
