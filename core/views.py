@@ -235,8 +235,9 @@ def _calcular_monto_reserva(reserva) -> Decimal:
     if not inicio or not fin or fin <= inicio:
         horas = 1
     else:
-        mins = max(1, int((fin - inicio).total_seconds() // 60))
-        horas = math.ceil(mins / 60)
+        duracion_segundos = (fin - inicio).total_seconds()
+        minutos = max(1, math.ceil(duracion_segundos / 60))
+        horas = math.ceil(minutos / 60)
 
     monto = Decimal(horas) * tarifa
     if monto < minimo:
