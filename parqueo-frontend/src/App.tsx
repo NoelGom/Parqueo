@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import ResourcePage from "./pages/ResourcePage";
 import ParqueoDetail from "./pages/ParqueoDetail";
+import Cobrar from "./pages/Cobrar";           // 👈
 import { resources } from "./resources/resourcesConfig";
 
 export default function App() {
@@ -23,6 +24,9 @@ export default function App() {
 
         {/* Mapa de espacios por parqueo */}
         <Route path="/parqueos/:id/espacios" element={<ParqueoDetail />} />
+
+        {/* Cobro con tarjeta */}
+        <Route path="/pagos/cobrar" element={<Cobrar />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

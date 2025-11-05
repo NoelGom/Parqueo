@@ -109,6 +109,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Tarifa base por hora de parqueo (en quetzales)
+PAGOS_TARIFA_Q_HORA = 10
+
+# Monto mínimo a cobrar (en quetzales)
+PAGOS_MINIMO_Q = 5
 # ---------------------------------------------------------
 # CONFIGURACIÓN DE REST FRAMEWORK
 # ---------------------------------------------------------

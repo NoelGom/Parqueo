@@ -1,4 +1,9 @@
 from datetime import timedelta
+import math
+from decimal import Decimal
+import re
+
+from django.conf import settings
 from django.utils.timezone import now
 from django.db.models import Count
 from django.http import HttpResponse
@@ -14,7 +19,8 @@ from .models import (
 )
 from .serializers import (
     RolSerializer, UsuarioSerializer, ParqueoSerializer, EspacioSerializer,
-    VehiculoSerializer, ReservaSerializer, PagoSerializer, SensorSerializer, LecturaSerializer
+    VehiculoSerializer, ReservaSerializer, PagoSerializer, SensorSerializer, LecturaSerializer,
+    PagoCobroSerializer
 )
 
 # ---------- Healthcheck ----------
@@ -59,12 +65,12 @@ class EspacioViewSet(BaseViewSet):
 
     def get_queryset(self):
         qs = Espacio.objects.select_related("parqueo").all()
-        parqueo_id = self.request.query_params.get("parqueo_id")
+        parqueo_id = self.request.query_params.get("parqueo_id") or self.request.query_params.get("parqueo")
         if parqueo_id:
             qs = qs.filter(parqueo_id=parqueo_id)
         return qs
 
-    # --- Acciones para el tablero ---
+    # --- Acciones tablero ---
     @csrf_exempt
     @action(detail=True, methods=["post"], url_path="ocupar")
     def ocupar(self, request, pk=None):
@@ -78,6 +84,22 @@ class EspacioViewSet(BaseViewSet):
     def liberar(self, request, pk=None):
         espacio = self.get_object()
         espacio.estado = "libre"
+        espacio.save(update_fields=["estado"])
+        return Response({"id": espacio.id, "estado": espacio.estado})
+
+    @csrf_exempt
+    @action(detail=True, methods=["post"], url_path="reservar")
+    def reservar(self, request, pk=None):
+        espacio = self.get_object()
+        espacio.estado = "reservado"
+        espacio.save(update_fields=["estado"])
+        return Response({"id": espacio.id, "estado": espacio.estado})
+
+    @csrf_exempt
+    @action(detail=True, methods=["post"], url_path="fuera-servicio")
+    def fuera_servicio(self, request, pk=None):
+        espacio = self.get_object()
+        espacio.estado = "fuera_servicio"
         espacio.save(update_fields=["estado"])
         return Response({"id": espacio.id, "estado": espacio.estado})
 
@@ -109,6 +131,21 @@ class ReservaViewSet(BaseViewSet):
     serializer_class = ReservaSerializer
     search_fields = ["estado", "usuario__email", "parqueo__nombre"]
     ordering_fields = ["id", "inicio_previsto", "fin_previsto", "estado", "creado_en"]
+
+    # --- COBRAR desde la reserva ---
+    @csrf_exempt
+    @action(detail=True, methods=["post"], url_path="cobrar")
+    def cobrar(self, request, pk=None):
+        reserva = self.get_object()
+        payload = {
+            "reserva_id": reserva.id,
+            "metodo": request.data.get("metodo") or "efectivo",
+            "monto_q": request.data.get("monto_q")
+        }
+        ser = PagoCobroSerializer(data=payload)
+        ser.is_valid(raise_exception=True)
+        pago = _crear_pago_con_calculo(ser.validated_data, reserva=reserva)
+        return Response(PagoSerializer(pago).data, status=201)
 
 
 class PagoViewSet(BaseViewSet):
@@ -162,3 +199,80 @@ class StatsReservas7d(APIView):
             d = (fin - timedelta(days=i)).date().isoformat()
             serie.append({"fecha": d, "reservas": mapa.get(d, 0)})
         return Response({"serie": serie})
+
+
+# ---------- Mapa por filas/columnas ----------
+class MapaParqueo(APIView):
+    permission_classes = [permissions.AllowAny]
+    def get(self, request, parqueo_id: int):
+        qs = Espacio.objects.filter(parqueo_id=parqueo_id).values("id", "codigo", "estado")
+        patron = re.compile(r"^\s*([A-Za-z]+)\s*[-_]\s*(\d+)\s*$")
+        filas_set, columnas_max, celdas = set(), 0, []
+        for e in qs:
+            codigo = e["codigo"] or ""
+            m = patron.match(codigo)
+            if m:
+                fila = m.group(1).upper()
+                col = int(m.group(2))
+            else:
+                fila, col = "?", 999
+            filas_set.add(fila)
+            columnas_max = max(columnas_max, col if col != 999 else 0)
+            celdas.append({"fila": fila, "col": col, "id": e["id"], "codigo": codigo, "estado": e["estado"]})
+        filas = sorted(filas_set, key=lambda x: (x == "?", x))
+        celdas.sort(key=lambda x: (x["fila"] == "?", x["fila"], x["col"]))
+        return Response({"parqueo_id": int(parqueo_id), "filas": filas, "columnas_max": columnas_max, "celdas": celdas})
+
+
+# ---------- Cobros helper & endpoint ----------
+def _calcular_monto_reserva(reserva) -> Decimal:
+    """Regla simple: redondeo hacia arriba por hora, con mínimo."""
+    tarifa = Decimal(getattr(settings, "PAGOS_TARIFA_Q_HORA", 10))
+    minimo = Decimal(getattr(settings, "PAGOS_MINIMO_Q", 0))
+
+    inicio = reserva.inicio_real or reserva.inicio_previsto
+    fin = reserva.fin_real or reserva.fin_previsto or now()
+    if not inicio or not fin or fin <= inicio:
+        horas = 1
+    else:
+        mins = max(1, int((fin - inicio).total_seconds() // 60))
+        horas = math.ceil(mins / 60)
+
+    monto = Decimal(horas) * tarifa
+    if monto < minimo:
+        monto = minimo
+    return monto.quantize(Decimal("0.01"))
+
+def _crear_pago_con_calculo(data, reserva=None):
+    # data: {reserva_id, metodo, monto_q?}
+    if not reserva:
+        reserva = Reserva.objects.get(id=data["reserva_id"])
+    monto = Decimal(data["monto_q"]) if data.get("monto_q") else _calcular_monto_reserva(reserva)
+    estado = "aprobado" if data["metodo"] in ("efectivo", "tarjeta") else "pendiente"
+
+    pago = Pago.objects.create(
+        reserva_id=reserva.id,
+        metodo=data["metodo"],
+        monto_q=monto,
+        estado=estado,
+        creado_en=now(),
+    )
+
+    # Si querés marcar la reserva finalizada al cobrar, descomentá este bloque:
+    # if estado == "aprobado":
+    #     reserva.estado = "finalizada"
+    #     reserva.total_q = monto
+    #     reserva.save(update_fields=["estado", "total_q"])
+
+    return pago
+
+class PagoCobrar(APIView):
+    """Endpoint genérico para cobrar (sin pasar por /reservas/<id>/cobrar/)"""
+    permission_classes = [permissions.AllowAny]
+
+    @csrf_exempt
+    def post(self, request):
+        ser = PagoCobroSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        pago = _crear_pago_con_calculo(ser.validated_data)
+        return Response(PagoSerializer(pago).data, status=201)
