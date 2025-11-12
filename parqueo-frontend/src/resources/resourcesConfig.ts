@@ -78,6 +78,7 @@ export const resources: ResourceConfig[] = [
         labelKey: "nombre",
       },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-tn6qom
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
         name: "tipo",
@@ -103,6 +104,13 @@ export const resources: ResourceConfig[] = [
           { value: "reservado", label: "Reservado" },
           { value: "fuera_servicio", label: "Fuera de servicio" },
         ],
+      {
+        name: "disponible",
+        label: "Disponible",
+        type: "checkbox",
+        list: true,
+        parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
+ main
       },
     ],
   },
@@ -180,6 +188,7 @@ export const resources: ResourceConfig[] = [
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
       { name: "espacio", label: "Espacio (ID)", type: "number", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-tn6qom
       {
         name: "tipo",
         label: "Tipo",
@@ -192,6 +201,9 @@ export const resources: ResourceConfig[] = [
           { value: "otro", label: "Otro" },
         ],
       },
+
+      { name: "tipo", label: "Tipo", type: "text", list: true },
+ main
       {
         name: "activo",
         label: "Activo",
