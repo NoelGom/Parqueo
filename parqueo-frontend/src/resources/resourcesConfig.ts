@@ -1,6 +1,9 @@
 // src/resources/resourcesConfig.ts
 import type { ResourceConfig, SelectOption } from "../types";
 
+const toNumber = (value: unknown) => Number(value);
+const booleanToInt = (value: unknown) => (Boolean(value) ? 1 : 0);
+
 const estadoOcupacionOptions: SelectOption[] = [
   { value: "libre", label: "Libre" },
   { value: "ocupado", label: "Ocupado" },
@@ -74,13 +77,7 @@ export const resources: ResourceConfig[] = [
         valueKey: "id",
         labelKey: "nombre",
       },
-      {
-        name: "activo",
-        label: "Activo",
-        type: "checkbox",
-        list: true,
-        parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
-      },
+      { name: "activo", label: "Activo", type: "checkbox", list: true, parseOut: booleanToInt },
       { name: "password", label: "Password (solo crear)", type: "text", list: false },
     ],
   },
@@ -92,13 +89,7 @@ export const resources: ResourceConfig[] = [
       { name: "id", label: "ID", type: "number", list: true },
       { name: "nombre", label: "Nombre", type: "text", required: true, list: true },
       { name: "direccion", label: "Dirección", type: "text", list: true },
-      {
-        name: "activo",
-        label: "Activo",
-        type: "checkbox",
-        list: true,
-        parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
-      },
+      { name: "activo", label: "Activo", type: "checkbox", list: true, parseOut: booleanToInt },
     ],
   },
   {
@@ -118,13 +109,6 @@ export const resources: ResourceConfig[] = [
         labelKey: "nombre",
       },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
- codex/fix-python-server-startup-after-git-pull-q32jis
-
- codex/fix-python-server-startup-after-git-pull-05wl88
-
- codex/fix-python-server-startup-after-git-pull-tn6qom
- main
- main
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
         name: "tipo",
@@ -159,7 +143,7 @@ export const resources: ResourceConfig[] = [
         valueKey: "id",
         labelKey: "nombres",
         // El backend espera el ID numérico, así que convertimos si llega como string
-        parseOut: (value: unknown) => Number(value),
+        parseOut: toNumber,
       },
       { name: "placa", label: "Placa", type: "text", required: true, list: true },
       {
@@ -186,7 +170,7 @@ export const resources: ResourceConfig[] = [
         optionsEndpoint: "/api/usuarios/",
         valueKey: "id",
         labelKey: "nombres",
-        parseOut: (value: unknown) => Number(value),
+        parseOut: toNumber,
       },
       {
         name: "espacio",
@@ -197,7 +181,7 @@ export const resources: ResourceConfig[] = [
         optionsEndpoint: "/api/espacios/",
         valueKey: "id",
         labelKey: "codigo",
-        parseOut: (value: unknown) => Number(value),
+        parseOut: toNumber,
       },
       { name: "inicio", label: "Inicio", type: "datetime", list: true },
       { name: "fin", label: "Fin", type: "datetime", list: true },
@@ -225,7 +209,7 @@ export const resources: ResourceConfig[] = [
         optionsEndpoint: "/api/reservas/",
         valueKey: "id",
         labelKey: "id",
-        parseOut: (value: unknown) => Number(value),
+        parseOut: toNumber,
       },
       { name: "monto", label: "Monto", type: "number", list: true },
       {
@@ -253,7 +237,7 @@ export const resources: ResourceConfig[] = [
         optionsEndpoint: "/api/espacios/",
         valueKey: "id",
         labelKey: "codigo",
-        parseOut: (value: unknown) => Number(value),
+        parseOut: toNumber,
       },
       {
         name: "tipo",
@@ -267,7 +251,7 @@ export const resources: ResourceConfig[] = [
         label: "Activo",
         type: "checkbox",
         list: true,
-        parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
+        parseOut: booleanToInt,
       },
     ],
   },
@@ -286,7 +270,7 @@ export const resources: ResourceConfig[] = [
         optionsEndpoint: "/api/sensores/",
         valueKey: "id",
         labelKey: "id",
-        parseOut: (value: unknown) => Number(value),
+        parseOut: toNumber,
       },
       { name: "valor", label: "Valor", type: "number", list: true },
       { name: "fecha_hora", label: "Fecha/Hora", type: "datetime", list: true },
