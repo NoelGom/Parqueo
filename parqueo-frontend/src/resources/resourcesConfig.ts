@@ -67,7 +67,16 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/espacios/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
-      { name: "parqueo", label: "Parqueo (ID)", type: "number", required: true, list: true },
+      {
+        name: "parqueo",
+        label: "Parqueo",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/parqueos/",
+        valueKey: "id",
+        labelKey: "nombre",
+      },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
