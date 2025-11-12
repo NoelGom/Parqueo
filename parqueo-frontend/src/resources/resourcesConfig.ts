@@ -118,6 +118,13 @@ export const resources: ResourceConfig[] = [
         labelKey: "nombre",
       },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-q32jis
+
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
+ codex/fix-python-server-startup-after-git-pull-tn6qom
+ main
+ main
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
         name: "tipo",
