@@ -78,6 +78,10 @@ export const resources: ResourceConfig[] = [
         labelKey: "nombre",
       },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
+ codex/fix-python-server-startup-after-git-pull-tn6qom
+ main
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
         name: "tipo",
@@ -103,6 +107,16 @@ export const resources: ResourceConfig[] = [
           { value: "reservado", label: "Reservado" },
           { value: "fuera_servicio", label: "Fuera de servicio" },
         ],
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
+      {
+        name: "disponible",
+        label: "Disponible",
+        type: "checkbox",
+        list: true,
+        parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
+ main
+ main
       },
     ],
   },
@@ -220,6 +234,7 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/sensores/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
+ codex/fix-python-server-startup-after-git-pull-05wl88
       {
         name: "espacio",
         label: "Espacio",
@@ -231,6 +246,10 @@ export const resources: ResourceConfig[] = [
         labelKey: "codigo",
         parseOut: (value: unknown) => Number(value),
       },
+
+      { name: "espacio", label: "Espacio (ID)", type: "number", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-tn6qom
+ main
       {
         name: "tipo",
         label: "Tipo",
@@ -243,6 +262,12 @@ export const resources: ResourceConfig[] = [
           { value: "otro", label: "Otro" },
         ],
       },
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
+
+      { name: "tipo", label: "Tipo", type: "text", list: true },
+ main
+ main
       {
         name: "activo",
         label: "Activo",
