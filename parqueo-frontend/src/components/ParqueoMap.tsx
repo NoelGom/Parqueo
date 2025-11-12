@@ -2,6 +2,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import toast from "react-hot-toast";
 
+type ApiListResponse<T> =
+  | T[]
+  | {
+      results?: T[];
+      next?: string | null;
+      previous?: string | null;
+      count?: number;
+    };
+
 type Espacio = {
   id: number;
   codigo: string;
@@ -18,7 +27,9 @@ async function fetchAllEspacios(parqueoId: number | string): Promise<Espacio[]> 
   let url: string | null = `/api/espacios/?parqueo_id=${parqueoId}`;
   const acc: Espacio[] = [];
   while (url) {
-    const { data } = await api.get(url);
+    const currentUrl: string = url as string;
+    const response = await api.get<ApiListResponse<Espacio>>(currentUrl);
+    const data: ApiListResponse<Espacio> = response.data;
     if (Array.isArray(data)) {
       acc.push(...(data as Espacio[]));
       url = null;
