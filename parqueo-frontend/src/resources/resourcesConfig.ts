@@ -78,7 +78,10 @@ export const resources: ResourceConfig[] = [
         labelKey: "nombre",
       },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
  codex/fix-python-server-startup-after-git-pull-tn6qom
+ main
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
         name: "tipo",
@@ -104,12 +107,15 @@ export const resources: ResourceConfig[] = [
           { value: "reservado", label: "Reservado" },
           { value: "fuera_servicio", label: "Fuera de servicio" },
         ],
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
       {
         name: "disponible",
         label: "Disponible",
         type: "checkbox",
         list: true,
         parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
+ main
  main
       },
     ],
@@ -120,7 +126,18 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/vehiculos/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
-      { name: "usuario", label: "Usuario (ID)", type: "number", required: true, list: true },
+      {
+        name: "usuario",
+        label: "Usuario",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/usuarios/",
+        valueKey: "id",
+        labelKey: "nombres",
+        // El backend espera el ID numérico, así que convertimos si llega como string
+        parseOut: (value: unknown) => Number(value),
+      },
       { name: "placa", label: "Placa", type: "text", required: true, list: true },
       {
         name: "tipo",
@@ -140,8 +157,28 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/reservas/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
-      { name: "usuario", label: "Usuario (ID)", type: "number", required: true, list: true },
-      { name: "espacio", label: "Espacio (ID)", type: "number", required: true, list: true },
+      {
+        name: "usuario",
+        label: "Usuario",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/usuarios/",
+        valueKey: "id",
+        labelKey: "nombres",
+        parseOut: (value: unknown) => Number(value),
+      },
+      {
+        name: "espacio",
+        label: "Espacio",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/espacios/",
+        valueKey: "id",
+        labelKey: "codigo",
+        parseOut: (value: unknown) => Number(value),
+      },
       { name: "inicio", label: "Inicio", type: "datetime", list: true },
       { name: "fin", label: "Fin", type: "datetime", list: true },
       {
@@ -164,7 +201,17 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/pagos/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
-      { name: "reserva", label: "Reserva (ID)", type: "number", required: true, list: true },
+      {
+        name: "reserva",
+        label: "Reserva",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/reservas/",
+        valueKey: "id",
+        labelKey: "id",
+        parseOut: (value: unknown) => Number(value),
+      },
       { name: "monto", label: "Monto", type: "number", list: true },
       {
         name: "estado",
@@ -187,8 +234,22 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/sensores/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
+ codex/fix-python-server-startup-after-git-pull-05wl88
+      {
+        name: "espacio",
+        label: "Espacio",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/espacios/",
+        valueKey: "id",
+        labelKey: "codigo",
+        parseOut: (value: unknown) => Number(value),
+      },
+
       { name: "espacio", label: "Espacio (ID)", type: "number", required: true, list: true },
  codex/fix-python-server-startup-after-git-pull-tn6qom
+ main
       {
         name: "tipo",
         label: "Tipo",
@@ -201,8 +262,11 @@ export const resources: ResourceConfig[] = [
           { value: "otro", label: "Otro" },
         ],
       },
+ codex/fix-python-server-startup-after-git-pull-05wl88
+
 
       { name: "tipo", label: "Tipo", type: "text", list: true },
+ main
  main
       {
         name: "activo",
@@ -219,7 +283,17 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/lecturas/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
-      { name: "sensor", label: "Sensor (ID)", type: "number", required: true, list: true },
+      {
+        name: "sensor",
+        label: "Sensor",
+        type: "select",
+        required: true,
+        list: true,
+        optionsEndpoint: "/api/sensores/",
+        valueKey: "id",
+        labelKey: "id",
+        parseOut: (value: unknown) => Number(value),
+      },
       { name: "valor", label: "Valor", type: "number", list: true },
       { name: "fecha_hora", label: "Fecha/Hora", type: "datetime", list: true },
     ],
