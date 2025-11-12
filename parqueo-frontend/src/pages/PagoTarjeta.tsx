@@ -56,7 +56,7 @@ export default function PagoTarjeta() {
       };
 
       // Endpoint de cobro (el que integramos antes en el backend)
-      const { data } = await api.post("/api/pagos/cobrar/", payload);
+      await api.post("/api/pagos/cobrar/", payload);
 
       toast.success("Pago realizado con éxito");
       // Redirigir al listado de pagos o donde prefieras

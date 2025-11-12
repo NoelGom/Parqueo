@@ -21,18 +21,12 @@ import {
 } from "recharts";
 
 /* ---------- Normalizador de respuesta de listados ---------- */
-type PageShape =
-  | any[]
-  | {
-      results?: any[];
-      count?: number;
-      next?: string | null;
-      previous?: string | null;
-    }
-  | { items?: any[]; total?: number; next?: string | null; prev?: string | null }
-  | Record<string, any>;
-
-function normalizePage(data?: PageShape) {
+function normalizePage(data?: unknown): {
+  rows: any[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+} {
   if (!data)
     return {
       rows: [] as any[],
@@ -85,7 +79,7 @@ export default function ResourcePage({
   const [search, setSearch] = useState(sp.get("search") ?? "");
   const page = Number(sp.get("page") || 1);
 
-  const listQ = useResourceList<any>(res, search, page);
+  const listQ = useResourceList(res, search, page);
   const one = useResourceOne<any>(res, id);
   const { createM, updateM, deleteM } = useResourceMutations(res);
 
