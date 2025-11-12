@@ -1,5 +1,45 @@
 // src/resources/resourcesConfig.ts
-import type { ResourceConfig } from "../types";
+import type { ResourceConfig, SelectOption } from "../types";
+
+const estadoOcupacionOptions: SelectOption[] = [
+  { value: "libre", label: "Libre" },
+  { value: "ocupado", label: "Ocupado" },
+  { value: "reservado", label: "Reservado" },
+  { value: "fuera_servicio", label: "Fuera de servicio" },
+];
+
+const espacioTipoOptions: SelectOption[] = [
+  { value: "auto", label: "Auto" },
+  { value: "moto", label: "Moto" },
+  { value: "discapacitado", label: "Discapacitado" },
+  { value: "electrico", label: "Eléctrico" },
+];
+
+const vehiculoTipoOptions: SelectOption[] = [
+  { value: "auto", label: "Auto" },
+  { value: "moto", label: "Moto" },
+];
+
+const reservaEstadoOptions: SelectOption[] = [
+  { value: "pendiente", label: "Pendiente" },
+  { value: "activa", label: "Activa" },
+  { value: "cancelada", label: "Cancelada" },
+  { value: "finalizada", label: "Finalizada" },
+];
+
+const pagoEstadoOptions: SelectOption[] = [
+  { value: "pendiente", label: "Pendiente" },
+  { value: "aprobado", label: "Aprobado" },
+  { value: "fallido", label: "Fallido" },
+  { value: "reembolsado", label: "Reembolsado" },
+];
+
+const sensorTipoOptions: SelectOption[] = [
+  { value: "ultrasonico", label: "Ultrasónico" },
+  { value: "magnetico", label: "Magnético" },
+  { value: "camaras", label: "Cámaras" },
+  { value: "otro", label: "Otro" },
+];
 
 export const resources: ResourceConfig[] = [
   {
@@ -78,9 +118,12 @@ export const resources: ResourceConfig[] = [
         labelKey: "nombre",
       },
       { name: "codigo", label: "Código", type: "text", required: true, list: true },
+ codex/fix-python-server-startup-after-git-pull-q32jis
+
  codex/fix-python-server-startup-after-git-pull-05wl88
 
  codex/fix-python-server-startup-after-git-pull-tn6qom
+ main
  main
       { name: "nivel", label: "Nivel", type: "text", list: true },
       {
@@ -88,12 +131,7 @@ export const resources: ResourceConfig[] = [
         label: "Tipo",
         type: "select",
         list: true,
-        options: [
-          { value: "auto", label: "Auto" },
-          { value: "moto", label: "Moto" },
-          { value: "discapacitado", label: "Discapacitado" },
-          { value: "electrico", label: "Eléctrico" },
-        ],
+        options: espacioTipoOptions,
       },
       {
         name: "estado",
@@ -101,22 +139,7 @@ export const resources: ResourceConfig[] = [
         type: "select",
         required: true,
         list: true,
-        options: [
-          { value: "libre", label: "Libre" },
-          { value: "ocupado", label: "Ocupado" },
-          { value: "reservado", label: "Reservado" },
-          { value: "fuera_servicio", label: "Fuera de servicio" },
-        ],
- codex/fix-python-server-startup-after-git-pull-05wl88
-
-      {
-        name: "disponible",
-        label: "Disponible",
-        type: "checkbox",
-        list: true,
-        parseOut: (v: unknown) => (Boolean(v) ? 1 : 0),
- main
- main
+        options: estadoOcupacionOptions,
       },
     ],
   },
@@ -144,10 +167,7 @@ export const resources: ResourceConfig[] = [
         label: "Tipo",
         type: "select",
         list: true,
-        options: [
-          { value: "auto", label: "Auto" },
-          { value: "moto", label: "Moto" },
-        ],
+        options: vehiculoTipoOptions,
       },
     ],
   },
@@ -186,12 +206,7 @@ export const resources: ResourceConfig[] = [
         label: "Estado",
         type: "select",
         list: true,
-        options: [
-          { value: "pendiente", label: "Pendiente" },
-          { value: "activa", label: "Activa" },
-          { value: "cancelada", label: "Cancelada" },
-          { value: "finalizada", label: "Finalizada" },
-        ],
+        options: reservaEstadoOptions,
       },
     ],
   },
@@ -218,12 +233,7 @@ export const resources: ResourceConfig[] = [
         label: "Estado",
         type: "select",
         list: true,
-        options: [
-          { value: "pendiente", label: "Pendiente" },
-          { value: "aprobado", label: "Aprobado" },
-          { value: "fallido", label: "Fallido" },
-          { value: "reembolsado", label: "Reembolsado" },
-        ],
+        options: pagoEstadoOptions,
       },
       { name: "fecha", label: "Fecha", type: "date", list: true },
     ],
@@ -234,7 +244,6 @@ export const resources: ResourceConfig[] = [
     endpoint: "/api/sensores/",
     fields: [
       { name: "id", label: "ID", type: "number", list: true },
- codex/fix-python-server-startup-after-git-pull-05wl88
       {
         name: "espacio",
         label: "Espacio",
@@ -246,28 +255,13 @@ export const resources: ResourceConfig[] = [
         labelKey: "codigo",
         parseOut: (value: unknown) => Number(value),
       },
-
-      { name: "espacio", label: "Espacio (ID)", type: "number", required: true, list: true },
- codex/fix-python-server-startup-after-git-pull-tn6qom
- main
       {
         name: "tipo",
         label: "Tipo",
         type: "select",
         list: true,
-        options: [
-          { value: "ultrasonico", label: "Ultrasónico" },
-          { value: "magnetico", label: "Magnético" },
-          { value: "camaras", label: "Cámaras" },
-          { value: "otro", label: "Otro" },
-        ],
+        options: sensorTipoOptions,
       },
- codex/fix-python-server-startup-after-git-pull-05wl88
-
-
-      { name: "tipo", label: "Tipo", type: "text", list: true },
- main
- main
       {
         name: "activo",
         label: "Activo",
