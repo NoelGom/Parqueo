@@ -4,6 +4,15 @@ import { api } from "../lib/api";
 import toast from "react-hot-toast";
 import PagoReservaButton from "../components/PagoReservaButton";
 
+type ApiListResponse<T> =
+  | T[]
+  | {
+      results?: T[];
+      next?: string | null;
+      previous?: string | null;
+      count?: number;
+    };
+
 type Reserva = {
   id: number;
   usuario: number;
@@ -28,61 +37,86 @@ type Usuario = {
 type Parqueo = { id: number; nombre: string };
 type Espacio = { id: number; codigo: string };
 
+const ESTADOS = [
+  "pendiente|activa",
+  "todas",
+  "pendiente",
+  "activa",
+  "finalizada",
+  "cancelada",
+] as const;
+type EstadoFiltro = (typeof ESTADOS)[number];
+
 export default function PagosPage() {
-  const [estadoFiltro, setEstadoFiltro] = useState<"pendiente|activa|todas" | "pendiente" | "activa" | "todas">("pendiente|activa");
+  const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltro>("pendiente|activa");
 
   // reservas (paginación simple; si usas DRF paginado, puedes iterar .next)
-  const reservasQ = useQuery({
+  const reservasQ = useQuery<Reserva[]>({
     queryKey: ["reservas", estadoFiltro],
     queryFn: async () => {
-      const { data } = await api.get("/api/reservas/", { params: { ordering: "-inicio_previsto" } });
-      const arr: Reserva[] = Array.isArray(data) ? data : (data.results || []);
+      const { data } = await api.get<ApiListResponse<Reserva>>("/api/reservas/", {
+        params: { ordering: "-inicio_previsto" },
+      });
+      const arr: Reserva[] = Array.isArray(data) ? data : data.results ?? [];
       if (estadoFiltro === "todas") return arr;
-      if (estadoFiltro === "pendiente|activa") return arr.filter(r => r.estado === "pendiente" || r.estado === "activa");
-      return arr.filter(r => r.estado === estadoFiltro);
+      if (estadoFiltro === "pendiente|activa")
+        return arr.filter((r) => r.estado === "pendiente" || r.estado === "activa");
+      return arr.filter((r) => r.estado === estadoFiltro);
     },
   });
 
   // Carga mínima de usuarios/parqueos/espacios para mostrar etiquetas
-  const usuariosQ = useQuery({
+  const usuariosQ = useQuery<Usuario[]>({
     queryKey: ["usuarios-min"],
     queryFn: async () => {
-      const { data } = await api.get("/api/usuarios/", { params: { page_size: 1000 } });
-      return Array.isArray(data) ? data : (data.results || []);
+      const { data } = await api.get<ApiListResponse<Usuario>>("/api/usuarios/", {
+        params: { page_size: 1000 },
+      });
+      return Array.isArray(data) ? data : data.results ?? [];
     },
   });
 
-  const parqueosQ = useQuery({
+  const parqueosQ = useQuery<Parqueo[]>({
     queryKey: ["parqueos-min"],
     queryFn: async () => {
-      const { data } = await api.get("/api/parqueos/", { params: { page_size: 1000 } });
-      return Array.isArray(data) ? data : (data.results || []);
+      const { data } = await api.get<ApiListResponse<Parqueo>>("/api/parqueos/", {
+        params: { page_size: 1000 },
+      });
+      return Array.isArray(data) ? data : data.results ?? [];
     },
   });
 
-  const espaciosQ = useQuery({
+  const espaciosQ = useQuery<Espacio[]>({
     queryKey: ["espacios-min"],
     queryFn: async () => {
-      const { data } = await api.get("/api/espacios/", { params: { page_size: 1000 } });
-      return Array.isArray(data) ? data : (data.results || []);
+      const { data } = await api.get<ApiListResponse<Espacio>>("/api/espacios/", {
+        params: { page_size: 1000 },
+      });
+      return Array.isArray(data) ? data : data.results ?? [];
     },
   });
 
   const mapaUsuarios = useMemo<Record<number, Usuario>>(() => {
-    const m: any = {};
-    (usuariosQ.data || []).forEach((u: Usuario) => (m[u.id] = u));
+    const m: Record<number, Usuario> = {};
+    (usuariosQ.data ?? []).forEach((u) => {
+      m[u.id] = u;
+    });
     return m;
   }, [usuariosQ.data]);
 
   const mapaParqueos = useMemo<Record<number, Parqueo>>(() => {
-    const m: any = {};
-    (parqueosQ.data || []).forEach((p: Parqueo) => (m[p.id] = p));
+    const m: Record<number, Parqueo> = {};
+    (parqueosQ.data ?? []).forEach((p) => {
+      m[p.id] = p;
+    });
     return m;
   }, [parqueosQ.data]);
 
   const mapaEspacios = useMemo<Record<number, Espacio>>(() => {
-    const m: any = {};
-    (espaciosQ.data || []).forEach((e: Espacio) => (m[e.id] = e));
+    const m: Record<number, Espacio> = {};
+    (espaciosQ.data ?? []).forEach((e) => {
+      m[e.id] = e;
+    });
     return m;
   }, [espaciosQ.data]);
 
@@ -112,7 +146,7 @@ export default function PagosPage() {
           <select
             className="bg-gray-800 text-white px-3 py-2 rounded"
             value={estadoFiltro}
-            onChange={(e) => setEstadoFiltro(e.target.value as any)}
+            onChange={(e) => setEstadoFiltro(e.target.value as EstadoFiltro)}
           >
             <option value="pendiente|activa">Pendiente/Activa</option>
             <option value="todas">Todas</option>
