@@ -247,6 +247,13 @@ export const resources: ResourceConfig[] = [
         options: sensorTipoOptions,
       },
       {
+        name: "identificador_hardware",
+        label: "Identificador HW",
+        type: "text",
+        required: true,
+        list: true,
+      },
+      {
         name: "activo",
         label: "Activo",
         type: "checkbox",
