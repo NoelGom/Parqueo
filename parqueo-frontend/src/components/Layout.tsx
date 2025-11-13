@@ -1,6 +1,7 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import type { PropsWithChildren } from "react";
 
-export default function Layout() {
+export default function Layout({ children }: PropsWithChildren) {
   return (
     <>
       <nav className="navbar">
@@ -21,7 +22,7 @@ export default function Layout() {
         </div>
       </nav>
       <main className="container" style={{paddingTop:24}}>
-        <Outlet />
+        {children}
       </main>
       <footer className="container" style={{opacity:.6, paddingTop:40, paddingBottom:24}}>
         Parqueo — 2025
