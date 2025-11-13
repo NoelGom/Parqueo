@@ -184,6 +184,7 @@ class StatsSummary(APIView):
 
 class StatsReservas7d(APIView):
     permission_classes = [permissions.AllowAny]
+
     def get(self, request):
         fin = now()
         ini = fin - timedelta(days=6)
@@ -194,11 +195,13 @@ class StatsReservas7d(APIView):
             .annotate(c=Count("id"))
         )
         mapa = {r["inicio_previsto__date"].isoformat(): r["c"] for r in qs}
-        serie = []
+
+        series = []
         for i in range(6, -1, -1):
-            d = (fin - timedelta(days=i)).date().isoformat()
-            serie.append({"fecha": d, "reservas": mapa.get(d, 0)})
-        return Response({"serie": serie})
+            dia = (fin - timedelta(days=i)).date().isoformat()
+            series.append({"date": dia, "count": mapa.get(dia, 0)})
+
+        return Response({"series": series})
 
 
 # ---------- Mapa por filas/columnas ----------
